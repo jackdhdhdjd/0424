@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>比賽紀錄器</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f2f2f2; }
+    h1 { text-align: center; }
+    .buttons { text-align: center; margin-bottom: 20px; }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    .win { color: red; font-weight: bold; }
+    #status { text-align: center; margin-bottom: 10px; font-size: 18px; }
+    #table-wrapper { max-height: 400px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <h1>比賽紀錄器</h1>
+  <div id="status">目前比賽場數：0 / 100｜勝率：N/A</div>
+  <div class="buttons">
+    <button onclick="recordResult('W')" style="background: lightgreen">贏</button>
+    <button onclick="recordResult('L')" style="background: tomato">輸</button>
+    <button onclick="clearResults()" style="background: lightgray">清除結果</button>
+  </div>
+  <div id="table-wrapper">
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>場次</th>
+          <th>結果</th>
+          <th>時間</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const results = [];
+    function recordResult(result) {
+      if (results.length >= 100) {
+        alert("已經記錄滿 100 場比賽！");
+        return;
+      }
+      const time = new Date().toLocaleTimeString();
+      results.push(result);
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${results.length}</td>
+        <td class="${result === 'W' ? 'win' : ''}">${result === 'W' ? '勝利' : '失敗'}</td>
+        <td>${time}</td>
+      `;
+      document.querySelector("#resultTable tbody").appendChild(row);
+
+      // Scroll to bottom
+      const wrapper = document.getElementById("table-wrapper");
+      wrapper.scrollTop = wrapper.scrollHeight;
+
+      updateStatus();
+
+      if (results.length === 100) {
+        const winCount = results.filter(r => r === 'W').length;
+        const loseCount = results.filter(r => r === 'L').length;
+        alert(`比賽結束！\n勝利：${winCount}\n失敗：${loseCount}`);
+      }
+    }
+
+    function updateStatus() {
+      const winCount = results.filter(r => r === 'W').length;
+      const total = results.length;
+      const rate = total ? ((winCount / total) * 100).toFixed(1) + '%' : 'N/A';
+      document.getElementById("status").textContent = `目前比賽場數：${total} / 100｜勝率：${rate}`;
+    }
+
+    function clearResults() {
+      results.length = 0;
+      document.querySelector("#resultTable tbody").innerHTML = "";
+      updateStatus();
+    }
+  </script>
+</body>
+</html>
